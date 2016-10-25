@@ -1,0 +1,30 @@
+{
+  "name": "lameufquijouedans",
+  "version": "0.0.1",
+  "description": "api connexion to find any actor your forgot the name",
+  "main": "app.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/francasix/lameufquijouedans.git"
+  },
+  "keywords": [
+    "webpack",
+    "api"
+  ],
+  "author": "francasix",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/francasix/lameufquijouedans/issues"
+  },
+  "homepage": "https://github.com/francasix/lameufquijouedans#readme",
+  "devDependencies": {
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-register": "^6.14.0",
+    "webpack": "^1.13.2"
+  }
+}
