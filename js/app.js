@@ -4,7 +4,7 @@ var app = {
     const list = document.getElementById('list-result')
     this.apiKey = '?api_key=148d9341acd58f310f70e4660a4a9add'
     this.apiUrl = 'https://api.themoviedb.org/3/'
-
+    this.array = []
 
     btn.addEventListener('click', () => {
       //get input value and request IMDB
@@ -12,8 +12,11 @@ var app = {
       this.movieApi(this.apiUrl + 'search/movie' + this.apiKey + '&query=harry%20potter').then((movies) => {
         return this.getMovieId(movies)
       }).then((movieIds) => {
-        return this.getCast(movieIds)
+        var test = this.getCast(movieIds)
+        console.log('test', test)
+        return test
       }).then((data) => {
+        console.log('next', data)
         return this.getActors(data)
       }).catch((err) => {
 
@@ -42,7 +45,6 @@ var app = {
         }
       }
       httpRequest.send()
-
     })
   },
   getMovieId(movies) {
@@ -71,28 +73,41 @@ var app = {
   },
   getCast(movieIds) {
 
-    var array = []
-    for (let i = 0; i < movieIds.length; i++) {
-      let getUrl = this.apiUrl + 'movie/' + movieIds[i] + '/credits' + this.apiKey
-      let httpRequest = new XMLHttpRequest()
+    var count = 0;
+
+    for (var i = 0; i < movieIds.length; i++) {
+
+      var getUrl = this.apiUrl + 'movie/' + movieIds[i] + '/credits' + this.apiKey
+      var httpRequest = new XMLHttpRequest()
+
+      count++
+      httpRequest.onreadystatechange = this.requestCb(httpRequest, count, movieIds.length, this.array, this.callback)
 
       httpRequest.open('GET', getUrl)
+      httpRequest.send()
 
-      httpRequest.onreadystatechange = function () {
-        if (this.readyState === 4) {
+      return this.requestCb
+    }
+  },
+  requestCb(req, count, max, array, cb) {
 
-          if (this.status === 200 && JSON.parse(this.response).cast.length > 0) {
+    return function () {
+      if (req.readyState == 4) {
+        if (req.status === 200 && JSON.parse(req.response).cast.length > 0) {
+          for (var x = 0; x < (JSON.parse(req.response).cast).length; x++) {
 
-            for (let x = 0; x < (JSON.parse(this.response).cast).length; x++) {
-              array.push(JSON.parse(this.response).cast[x])
-            }
+            // put in array all casts of all movies
+            array.push(JSON.parse(req.response).cast[x])
           }
         }
-        console.log('array', array.length)
       }
-      httpRequest.send()
+      // end first loop 
+      if (count == max) {
+        console.log('toutouyoutou', array)
+        return array
+      }
     }
-    return array
+
   }
 }
 
