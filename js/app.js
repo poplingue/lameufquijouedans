@@ -7,36 +7,44 @@ var app = {
     this.array = []
 
     btn.addEventListener('click', () => {
-      //get input value and request IMDB
-
-      this.movieApi(this.apiUrl + 'search/movie' + this.apiKey + '&query=harry%20potter').then((movies) => {
-        return this.getMovieId(movies)
-      }).then((movieIds) => {
-        var test = this.getCast(movieIds)
-        console.log('test', test)
-        return test
-      }).then((data) => {
-        console.log('next', data)
-        return this.getActors(data)
-      }).catch((err) => {
-
+      this.results().then(() => {
+        console.log('after all')
       })
+
+    })
+  },
+  results() {
+
+    var a = this.movieApi(this.apiUrl + 'search/movie' + this.apiKey + '&query=harry%20potter')
+    var b = a.then((movies) => {
+      console.log('b')
+      return this.getMovieId(movies)
+    })
+    var c = b.then((movieIds) => {
+        console.log('c')
+        return this.getCast(movieIds, this.callback)
+      })
+      // var d = c.then((data) => {
+      //   return this.getActors(data)
+      // })
+
+    return Promise.all([a, b, c]).then(function (values) {
+      console.log('promise all', values)
     })
   },
   movieApi(url) {
 
     return new Promise(function (resolve, reject) {
       //request from query movie
-      let httpRequest = new XMLHttpRequest()
-      let getUrl = url
-      httpRequest.open('GET', getUrl)
+      var httpRequest = new XMLHttpRequest()
+      httpRequest.open('GET', url)
 
       httpRequest.onreadystatechange = function () {
         if (this.readyState === 4) {
 
           if (this.status === 200) {
             console.log('resolve list movies')
-            //return list of movies
+              //return list of movies
             resolve(JSON.parse(this.responseText).results)
           } else {
             console.log('reject list movies', this.status)
@@ -49,16 +57,16 @@ var app = {
   },
   getMovieId(movies) {
 
-    if (movies['Response'] === 'False') {
-
-    } else {
-      this.arrayIds = []
-      //create array of all id movies
-      for (let index = 0; index < movies.length; index++) {
-        this.arrayIds.push(movies[index].id)
+    return new Promise(function (resolve, reject) {
+      var arrayIds = []
+      if (movies['Response'] === 'False') {} else {
+        //create array of all id movies
+        for (let index = 0; index < movies.length; index++) {
+          arrayIds.push(movies[index].id)
+        }
+        resolve(arrayIds)
       }
-      return this.arrayIds
-    }
+    })
   },
   getActors(data) {
 
@@ -69,46 +77,53 @@ var app = {
 
       }
     }
-
   },
-  getCast(movieIds) {
-
-    var count = 0;
-
-    for (var i = 0; i < movieIds.length; i++) {
-
-      var getUrl = this.apiUrl + 'movie/' + movieIds[i] + '/credits' + this.apiKey
-      var httpRequest = new XMLHttpRequest()
-
-      count++
-      httpRequest.onreadystatechange = this.requestCb(httpRequest, count, movieIds.length, this.array, this.callback)
-
-      httpRequest.open('GET', getUrl)
-      httpRequest.send()
-
-      return this.requestCb
+  callback(that, data) {
+    if (data) {
+      that.array.push(data)
+    } else {
+      return that.array
     }
   },
-  requestCb(req, count, max, array, cb) {
+  getCast(movieIds, callback) {
+    var self = this
+    this.array = []
+    this.count = 0
+    return new Promise(function (resolve, reject) {
 
-    return function () {
-      if (req.readyState == 4) {
-        if (req.status === 200 && JSON.parse(req.response).cast.length > 0) {
-          for (var x = 0; x < (JSON.parse(req.response).cast).length; x++) {
+      var url = ""
+      var req = []
+      var count = 0
 
-            // put in array all casts of all movies
-            array.push(JSON.parse(req.response).cast[x])
+      for (var i = 0; i < movieIds.length; i++) {
+
+        req[i] = new XMLHttpRequest()
+        url = self.apiUrl + 'movie/' + movieIds[i] + '/credits' + self.apiKey
+        req[i].open('GET', url)
+        self.count++
+
+          console.log('self.count', self.count)
+        req[i].onreadystatechange = function () {
+
+          if (this.readyState === 4) {
+            if (this.status === 200 && JSON.parse(this.response).cast.length > 0) {
+
+              for (var x = 0; x < (JSON.parse(this.response).cast).length; x++) {
+                callback(self, JSON.parse(this.response).cast[x]);
+
+                if (self.count === movieIds.length) {
+                  console.log('resolve')
+                  resolve(callback(self))
+                }
+
+              }
+            }
           }
         }
+        req[i].send()
       }
-      // end first loop 
-      if (count == max) {
-        console.log('toutouyoutou', array)
-        return array
-      }
-    }
-
+    })
   }
-}
+};
 
 module.exports = app.init();
