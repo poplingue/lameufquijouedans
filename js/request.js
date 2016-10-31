@@ -24,57 +24,43 @@ var app = {
     var promiseC = promiseB.then((movieIds) => {
       return this.getCast(movieIds, this.callback)
     })
-
-    return Promise.all([promiseA, promiseB, promiseC]).then((values) => {
+    var promiseD = promiseC.then((actor) => {
+      return this.actorFilter(actor)
+    })
+    return Promise.all([promiseA, promiseB, promiseC, promiseD]).then((values) => {
       console.log('prom all', values)
     })
   },
-  movieApi(url) {
-
-    return new Promise(function (resolve, reject) {
-      //request from query movie
-      var httpRequest = new XMLHttpRequest()
-      httpRequest.open('GET', url)
-
-      httpRequest.onreadystatechange = function () {
-        if (this.readyState === 4) {
-
-          if (this.status === 200) {
-            //return list of movies
-            resolve(JSON.parse(this.responseText).results)
-          } else {
-            console.log('reject list movies', this.status)
-            reject(Error(this.statusText))
-          }
-        }
-      }
-      httpRequest.send()
-    })
-  },
-  getMovieId(movies) {
-
-    return new Promise(function (resolve, reject) {
-      var arrayIds = []
-      if (movies['Response'] === 'False') { } else {
-        //create array of all id movies
-        for (let index = 0; index < movies.length; index++) {
-          arrayIds.push(movies[index].id)
-        }
-        resolve(arrayIds)
+  valueExist(array, newValue) {
+    array.forEach(function (item) {
+      console.log('item', item)
+      if (newValue === item) {
+        return false
+      } else {
+        return newValue
       }
     })
   },
-  getActors(data) {
-    console.log('getActors', data.length)
-    for (let index = 0; index < data.length; index++) {
-    }
+  actorFilter(actorObj) {
+    var self = this
+    return new Promise(function (resolve, reject) {
+      let array = []
+      for (let i = 0; i < actorObj.length; i++) {
+        let currentIdActor = self.valueExist(array, actorObj[i].id)
+
+        if (currentIdActor === false) {
+          console.log('test', !self.valueExist(array, currentIdActor), currentIdActor)
+          array.push(currentIdActor)
+        }
+        resolve(true)
+      }
+      console.log('array actorFilter', array)
+    })
   },
   callback(that, obj) {
     that.array.push(obj)
-
     if (obj === false) {
-      console.log('array length', that.array.length)
-      return that.getActors(that.array)
+      return
     }
   },
   getCast(movieIds, callback) {
@@ -114,6 +100,41 @@ var app = {
         }
         req[i].send()
       }
+    })
+  },
+  getMovieId(movies) {
+
+    return new Promise(function (resolve, reject) {
+      var arrayIds = []
+      if (movies['Response'] === 'False') { } else {
+        //create array of all id movies
+        for (let index = 0; index < movies.length; index++) {
+          arrayIds.push(movies[index].id)
+        }
+        resolve(arrayIds)
+      }
+    })
+  },
+  movieApi(url) {
+
+    return new Promise(function (resolve, reject) {
+      //request from query movie
+      var httpRequest = new XMLHttpRequest()
+      httpRequest.open('GET', url)
+
+      httpRequest.onreadystatechange = function () {
+        if (this.readyState === 4) {
+
+          if (this.status === 200) {
+            //return list of movies
+            resolve(JSON.parse(this.responseText).results)
+          } else {
+            console.log('reject list movies', this.status)
+            reject(Error(this.statusText))
+          }
+        }
+      }
+      httpRequest.send()
     })
   }
 }
