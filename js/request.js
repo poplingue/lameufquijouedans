@@ -21,9 +21,12 @@ var app = {
     var promiseB = promiseA.then((movies) => {
       return this.getMovieId(movies)
     })
+    var promiseC = promiseB.then((movieIds) => {
+      return this.getCast(movieIds, this.callback)
+    })
 
-    return Promise.all([promiseA, promiseB]).then((values) => {
-      this.getCast(values[1], this.callback)
+    return Promise.all([promiseA, promiseB, promiseC]).then((values) => {
+      console.log('prom all', values)
     })
   },
   movieApi(url) {
@@ -70,47 +73,48 @@ var app = {
     that.array.push(obj)
 
     if (obj === false) {
-      console.log('test', that.array.length)
+      console.log('array length', that.array.length)
       return that.getActors(that.array)
     }
   },
   getCast(movieIds, callback) {
     var self = this
 
-    // return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve, reject) {
 
-    var url = ""
-    var req = []
+      var url = ""
+      var req = []
 
-    for (var i = 0; i < movieIds.length; i++) {
+      for (var i = 0; i < movieIds.length; i++) {
 
-      req[i] = new XMLHttpRequest()
-      url = self.apiUrl + 'movie/' + movieIds[i] + '/credits' + self.apiKey
-      req[i].open('GET', url, true)
+        req[i] = new XMLHttpRequest()
+        url = self.apiUrl + 'movie/' + movieIds[i] + '/credits' + self.apiKey
+        req[i].open('GET', url, true)
 
-      req[i].onreadystatechange = function () {
+        req[i].onreadystatechange = function () {
 
-        if (this.readyState === 4) {
+          if (this.readyState === 4) {
 
-          self.count++
+            self.count++
 
-          if (this.status === 200 && (JSON.parse(this.response).cast).length > 0) {
+            if (this.status === 200 && (JSON.parse(this.response).cast).length > 0) {
 
-            for (var x = 0; x < (JSON.parse(this.response).cast).length; x++) {
+              for (var x = 0; x < (JSON.parse(this.response).cast).length; x++) {
 
-              if (self.count === movieIds.length) {
-                self.array = callback(self, false)
-                return
-              } else {
-                callback(self, JSON.parse(this.response).cast[x])
+                if (self.count === movieIds.length) {
+                  callback(self, false)
+                  resolve(self.array)
+                  return
+                } else {
+                  callback(self, JSON.parse(this.response).cast[x])
+                }
               }
             }
           }
         }
+        req[i].send()
       }
-      req[i].send()
-    }
-    // })
+    })
   }
 }
 
