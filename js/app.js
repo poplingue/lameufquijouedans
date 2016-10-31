@@ -5,6 +5,8 @@ var app = {
     this.apiKey = '?api_key=148d9341acd58f310f70e4660a4a9add'
     this.apiUrl = 'https://api.themoviedb.org/3/'
     this.array = []
+    this.count = 0
+    this.stop = false
 
     btn.addEventListener('click', () => {
       this.results().then(() => {
@@ -21,12 +23,12 @@ var app = {
       return this.getMovieId(movies)
     })
     var c = b.then((movieIds) => {
-        console.log('c')
-        return this.getCast(movieIds, this.callback)
-      })
-      // var d = c.then((data) => {
-      //   return this.getActors(data)
-      // })
+      console.log('c')
+      return this.getCast(movieIds, this.callback)
+    })
+    // var d = c.then((data) => {
+    //   return this.getActors(data)
+    // })
 
     return Promise.all([a, b, c]).then(function (values) {
       console.log('promise all', values)
@@ -44,7 +46,7 @@ var app = {
 
           if (this.status === 200) {
             console.log('resolve list movies')
-              //return list of movies
+            //return list of movies
             resolve(JSON.parse(this.responseText).results)
           } else {
             console.log('reject list movies', this.status)
@@ -59,7 +61,7 @@ var app = {
 
     return new Promise(function (resolve, reject) {
       var arrayIds = []
-      if (movies['Response'] === 'False') {} else {
+      if (movies['Response'] === 'False') { } else {
         //create array of all id movies
         for (let index = 0; index < movies.length; index++) {
           arrayIds.push(movies[index].id)
@@ -79,48 +81,45 @@ var app = {
     }
   },
   callback(that, data) {
-    if (data) {
-      that.array.push(data)
-    } else {
+    if (!data) {
       return that.array
+    } else {
+      that.array.push(data)
     }
   },
   getCast(movieIds, callback) {
     var self = this
-    this.array = []
-    this.count = 0
+
     return new Promise(function (resolve, reject) {
 
       var url = ""
       var req = []
-      var count = 0
 
       for (var i = 0; i < movieIds.length; i++) {
 
-        req[i] = new XMLHttpRequest()
-        url = self.apiUrl + 'movie/' + movieIds[i] + '/credits' + self.apiKey
-        req[i].open('GET', url)
         self.count++
+        (function (count) {
 
-          console.log('self.count', self.count)
-        req[i].onreadystatechange = function () {
+          req[i] = new XMLHttpRequest()
+          url = self.apiUrl + 'movie/' + movieIds[i] + '/credits' + self.apiKey
+          req[i].open('GET', url)
 
-          if (this.readyState === 4) {
-            if (this.status === 200 && JSON.parse(this.response).cast.length > 0) {
+          req[i].onreadystatechange = function () {
 
-              for (var x = 0; x < (JSON.parse(this.response).cast).length; x++) {
-                callback(self, JSON.parse(this.response).cast[x]);
+            if (this.readyState === 4) {
+              if (this.status === 200 && JSON.parse(this.response).cast.length > 0) {
 
-                if (self.count === movieIds.length) {
-                  console.log('resolve')
-                  resolve(callback(self))
+                for (var x = 0; x < (JSON.parse(this.response).cast).length; x++) {
+                  callback(self, JSON.parse(this.response).cast[x]);
                 }
-
+              }
+              if (count === movieIds.length) {
+                resolve(callback(self, false))
               }
             }
           }
-        }
-        req[i].send()
+          req[i].send()
+        })(self.count)
       }
     })
   }
