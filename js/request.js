@@ -1,5 +1,3 @@
-import $ from 'jquery'
-
 var app = {
   init() {
     const btn = document.querySelector('#send')
@@ -21,14 +19,18 @@ var app = {
     var promiseB = promiseA.then((movies) => {
       return this.getMovieId(movies)
     })
+
     var promiseC = promiseB.then((movieIds) => {
       return this.getCast(movieIds, this.callback)
     })
     var promiseD = promiseC.then((actor) => {
       return this.actorFilter(actor)
     })
+
     return Promise.all([promiseA, promiseB, promiseC, promiseD]).then((values) => {
       console.log('prom all', values)
+    }).catch((err) => {
+      console.log('catch all', err.message)
     })
   },
   valueExist(array, newValue) {
@@ -68,6 +70,10 @@ var app = {
 
     return new Promise(function (resolve, reject) {
 
+      if (movieIds.length === 0) {
+        reject(new Error("no result"))
+      }
+
       var url = ""
       var req = []
 
@@ -83,19 +89,19 @@ var app = {
 
             self.count++
 
-            if (this.status === 200 && (JSON.parse(this.response).cast).length > 0) {
+              if (this.status === 200 && (JSON.parse(this.response).cast).length > 0) {
 
-              for (var x = 0; x < (JSON.parse(this.response).cast).length; x++) {
+                for (var x = 0; x < (JSON.parse(this.response).cast).length; x++) {
 
-                if (self.count === movieIds.length) {
-                  callback(self, false)
-                  resolve(self.array)
-                  return
-                } else {
-                  callback(self, JSON.parse(this.response).cast[x])
+                  if (self.count === movieIds.length) {
+                    callback(self, false)
+                    resolve(self.array)
+                    return
+                  } else {
+                    callback(self, JSON.parse(this.response).cast[x])
+                  }
                 }
               }
-            }
           }
         }
         req[i].send()
@@ -106,7 +112,10 @@ var app = {
 
     return new Promise(function (resolve, reject) {
       var arrayIds = []
-      if (movies['Response'] === 'False') { } else {
+
+      if (movies.length === 0) {
+        reject(new Error("aucun résulat"))
+      } else {
         //create array of all id movies
         for (let index = 0; index < movies.length; index++) {
           arrayIds.push(movies[index].id)
@@ -129,8 +138,7 @@ var app = {
             //return list of movies
             resolve(JSON.parse(this.responseText).results)
           } else {
-            console.log('reject list movies', this.status)
-            reject(Error(this.statusText))
+            reject(new Error("url incorrecte"))
           }
         }
       }
