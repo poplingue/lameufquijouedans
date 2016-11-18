@@ -1,4 +1,3 @@
-import $ from 'jquery'
 
 var app = {
   init() {

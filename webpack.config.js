@@ -1,17 +1,25 @@
+var path = require("path");
+
 module.exports = {
-  entry: './js/app.js', //Need to bundle files
+  entry: {
+    js: './js/app.js',
+    jsx: './js/form.jsx'
+  },
   output: {
-    path: __dirname, //Output path
-    filename: "./js/bundle.js"
+    publicPath: '/js',
+    path: path.join(__dirname, "js"),
+    filename: "lameufquijouedans.bundle.js"
   },
   module: {
     loaders: [{
       test: /\.js$/,
       exclude: /(node_modules)/,
       loader: 'babel', // 'babel-loader' is also a legal name to reference
-      query: {
-        presets: ['es2015']
-      }
+    },
+    {
+      test: /\.jsx?/,
+      exclude: [/node_modules/],
+      loader: 'babel'
     }]
   },
   devtool: 'source-map'
