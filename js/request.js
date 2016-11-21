@@ -1,11 +1,11 @@
 var app = {
   init() {
-    const btn = document.querySelector('#send')
-    const list = document.getElementById('list-result')
-    this.apiKey = '?api_key=148d9341acd58f310f70e4660a4a9add'
-    this.apiUrl = 'https://api.themoviedb.org/3/'
-    this.array = []
-    this.count = 0
+    const btn = document.querySelector('#send');
+    const list = document.getElementById('list-result');
+    this.apiKey = '?api_key=148d9341acd58f310f70e4660a4a9add';
+    this.apiUrl = 'https://api.themoviedb.org/3/';
+    this.array = [];
+    this.count = 0;
 
     btn.addEventListener('click', () => {
       this.getCastMovies().then(() => {

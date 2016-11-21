@@ -1,25 +1,17 @@
 var path = require("path");
 
 module.exports = {
-  entry: {
-    js: './js/app.js',
-    jsx: './js/form.jsx'
-  },
+  entry: ['./js/app.js'],
   output: {
-    publicPath: '/js',
-    path: path.join(__dirname, "js"),
+    publicPath: 'js',
+    path: path.join(__dirname, "js/output"),
     filename: "lameufquijouedans.bundle.js"
   },
   module: {
     loaders: [{
-      test: /\.js$/,
+      test: [/\.js$/],
       exclude: /(node_modules)/,
       loader: 'babel', // 'babel-loader' is also a legal name to reference
-    },
-    {
-      test: /\.jsx?/,
-      exclude: [/node_modules/],
-      loader: 'babel'
     }]
   },
   devtool: 'source-map'

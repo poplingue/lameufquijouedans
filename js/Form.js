@@ -6,9 +6,8 @@ class Form extends React.Component {
     return (
       <form>
         <input type="text" placeholder='query' id="query" />
-        <input type="submit" value="search" />
+        <input type="submit" value="search" id="send" />
       </form>)
   }
 }
-
-render(<Form />, document.getElementById('form'));
+export default Form;
