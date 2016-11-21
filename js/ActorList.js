@@ -1,18 +1,24 @@
-var app = {
-  init() {
-    const btn = document.querySelector('#send');
-    const list = document.getElementById('list-result');
+import React from 'react';
+import { render } from 'react-dom';
+import Actor from './Actor';
+
+class ActorList extends React.Component {
+  constructor() {
+    super()
+    this.btn = document.querySelector('#send');
+    this.list = document.getElementById('list');
     this.apiKey = '?api_key=148d9341acd58f310f70e4660a4a9add';
     this.apiUrl = 'https://api.themoviedb.org/3/';
     this.array = [];
     this.count = 0;
+    this.launchSearch = this.launchSearch.bind(this);
+  }
+  launchSearch() {
 
-    btn.addEventListener('click', () => {
-      this.getCastMovies().then(() => {
-        console.log('toutouyoutou')
-      })
+    this.getCastMovies().then(() => {
+      console.log('toutouyoutou')
     })
-  },
+  }
   getCastMovies() {
 
     var promiseA = this.movieApi(this.apiUrl + 'search/movie' + this.apiKey + '&query=harry%20potter')
@@ -32,8 +38,9 @@ var app = {
     }).catch((err) => {
       console.log('catch all', err.message)
     })
-  },
+  }
   valueExist(array, newValue) {
+
     array.forEach(function (item) {
       console.log('item', item)
       if (newValue === item) {
@@ -42,8 +49,9 @@ var app = {
         return newValue
       }
     })
-  },
+  }
   actorFilter(actorObj) {
+
     var self = this
 
     return new Promise((resolve, reject) => {
@@ -59,13 +67,14 @@ var app = {
         resolve(actorObj)
       }
     })
-  },
+  }
   callback(that, obj) {
+
     that.array.push(obj)
     if (obj === false) {
       return
     }
-  },
+  }
   getCast(movieIds, callback) {
     var self = this
 
@@ -108,7 +117,7 @@ var app = {
         req[i].send()
       }
     })
-  },
+  }
   getMovieId(movies) {
 
     return new Promise((resolve, reject) => {
@@ -124,7 +133,7 @@ var app = {
         resolve(arrayIds)
       }
     })
-  },
+  }
   movieApi(url) {
 
     return new Promise((resolve, reject) => {
@@ -146,6 +155,18 @@ var app = {
       httpRequest.send()
     })
   }
-}
+  render() {
 
-module.exports = app;
+    return (
+      <div>
+        <form>
+          <input type="text" placeholder='query' id="query" />
+          <input type="submit" value="search" id="send" onClick={this.launchSearch} />
+        </form>
+        <ul>
+          <li><Actor /></li>
+        </ul>
+      </div>)
+  }
+}
+export default ActorList;
