@@ -13,15 +13,16 @@ class ActorList extends React.Component {
     this.count = 0;
     this.launchSearch = this.launchSearch.bind(this);
   }
-  launchSearch() {
+  launchSearch(e) {
 
+    e.preventDefault()
     this.getCastMovies().then(() => {
       console.log('toutouyoutou')
     })
   }
   getCastMovies() {
 
-    var promiseA = this.movieApi(this.apiUrl + 'search/movie' + this.apiKey + '&query=harry%20potter')
+    var promiseA = this.movieApi(this.apiUrl + 'search/movie' + this.apiKey + '&query=potter')
     var promiseB = promiseA.then((movies) => {
       return this.getMovieId(movies)
     })
@@ -34,32 +35,36 @@ class ActorList extends React.Component {
     })
 
     return Promise.all([promiseA, promiseB, promiseC, promiseD]).then((values) => {
-      console.log('prom all', values[3])
+      console.log('prom all', values)
     }).catch((err) => {
       console.log('catch all', err.message)
     })
   }
   valueExist(array, newValue) {
-
-    array.forEach(function (item) {
+    //return value if not yet in array
+    //array.forEach(function (item) {
+    for (var index = 0; index <= array.length; index++) {
       console.log('item', item)
       if (newValue === item) {
         return false
       } else {
         return newValue
       }
-    })
+    }
+    //})
   }
   actorFilter(actorObj) {
 
     var self = this
-
     return new Promise((resolve, reject) => {
 
-      let array = []
-      for (let i = 0; i < actorObj.length; i++) {
-        let currentIdActor = self.valueExist(array, actorObj[i].id)
+      var array = []
+      array.push(actorObj[0].id)
+      console.log('test', self.valueExist(array, 5049))
 
+      for (let i = 0; i < actorObj.length; i++) {
+
+        let currentIdActor = self.valueExist(array, actorObj[i].id)
         if (currentIdActor === false) {
           console.log('test', !self.valueExist(array, currentIdActor), currentIdActor)
           array.push(currentIdActor)
@@ -77,7 +82,6 @@ class ActorList extends React.Component {
   }
   getCast(movieIds, callback) {
     var self = this
-
     return new Promise((resolve, reject) => {
 
       if (movieIds.length === 0) {
@@ -148,7 +152,7 @@ class ActorList extends React.Component {
             //return list of movies
             resolve(JSON.parse(this.responseText).results)
           } else {
-            reject(new Error("url incorrecte"))
+            reject(new Error("status response : " + this.status))
           }
         }
       }
@@ -159,9 +163,9 @@ class ActorList extends React.Component {
 
     return (
       <div>
-        <form>
+        <form onSubmit={this.launchSearch}>
           <input type="text" placeholder='query' id="query" />
-          <input type="submit" value="search" id="send" onClick={this.launchSearch} />
+          <input type="submit" value="search" id="send" />
         </form>
         <ul>
           <li><Actor /></li>

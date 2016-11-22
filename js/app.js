@@ -1,6 +1,6 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-import ActorList from './ActorList';
+import ActorList from './ActorList'
 
-ReactDOM.render(<ActorList />, document.getElementById('list'));
+ReactDOM.render(<ActorList />, document.getElementById('list'))
