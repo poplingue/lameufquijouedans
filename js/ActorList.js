@@ -31,7 +31,12 @@ class ActorList extends React.Component {
       return this.getCast(movieIds, this.callback)
     })
     var promiseD = promiseC.then((actor) => {
-      return this.actorFilter(actor)
+      return this.actorFilterDouble(actor)
+    })
+    var promiseE = promiseD.then((list) => {
+      return this.splitListMaxRequest(list)
+    }).then((list) => {
+      this.actorList(list)
     })
 
     return Promise.all([promiseA, promiseB, promiseC, promiseD]).then((values) => {
@@ -40,8 +45,34 @@ class ActorList extends React.Component {
       console.log('catch all', err.message)
     })
   }
-  actorObjList() {
+  splitListMaxRequest(list) {
+    return new Promise((resolve, reject) => {
+      resolve(list)
+    })
+  }
+  actorList(listIds) {
+    //make array of objects with name & url image for each actor
+    return new Promise((resolve, reject) => {
+      let url = ""
+      let actorsList = []
+      let req = []
 
+      for (var u = 0; u < listIds.length; u++) {
+        url = this.apiUrl + 'person/' + listIds[u] + this.apiKey
+        req[u] = new XMLHttpRequest()
+        req[u].open('GET', url, true)
+
+        req[u].onreadystatechange = function () {
+
+          if (this.readyState === 4) {
+            if (this.status === 200) {
+              console.log('this req', this)
+            }
+          }
+        }
+        req[u].send()
+      }
+    })
   }
   valueExist(array, id) {
     //return value if not yet in array
@@ -57,10 +88,12 @@ class ActorList extends React.Component {
       }
     }
   }
-  actorFilter(actorObj) {
+  actorFilterDouble(actorObj) {
 
     return new Promise((resolve, reject) => {
-
+      if (actorObj.length === 0) {
+        reject(new Err('no result'))
+      }
       let array = []
       let currentIdActor = null
 
@@ -70,7 +103,6 @@ class ActorList extends React.Component {
           array.push(currentIdActor)
         }
         if ((actorObj.length - 1) === i) {
-          console.log('test', array)
           resolve(array)
         }
       }
@@ -91,8 +123,8 @@ class ActorList extends React.Component {
         reject(new Error("no result"))
       }
 
-      var url = ""
-      var req = []
+      let url = ""
+      let req = []
 
       for (var i = 0; i < movieIds.length; i++) {
 
