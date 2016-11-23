@@ -22,7 +22,7 @@ class ActorList extends React.Component {
   }
   getCastMovies() {
 
-    var promiseA = this.movieApi(this.apiUrl + 'search/movie' + this.apiKey + '&query=potter')
+    var promiseA = this.movieApi(this.apiUrl + 'search/movie' + this.apiKey + '&query=malcolm')
     var promiseB = promiseA.then((movies) => {
       return this.getMovieId(movies)
     })
@@ -40,45 +40,48 @@ class ActorList extends React.Component {
       console.log('catch all', err.message)
     })
   }
-  valueExist(array, newValue) {
+  actorObjList() {
+
+  }
+  valueExist(array, id) {
     //return value if not yet in array
-    //array.forEach(function (item) {
-    for (var index = 0; index <= array.length; index++) {
-      console.log('item', item)
-      if (newValue === item) {
-        return false
-      } else {
-        return newValue
+    if (array.length === 0) {
+      return id
+    }
+    for (var j = 0; j < array.length; j++) {
+      if (id === array[j]) {
+        return null
+      }
+      if (j === (array.length - 1)) {
+        return id
       }
     }
-    //})
   }
   actorFilter(actorObj) {
 
-    var self = this
     return new Promise((resolve, reject) => {
 
-      var array = []
-      array.push(actorObj[0].id)
-      console.log('test', self.valueExist(array, 5049))
+      let array = []
+      let currentIdActor = null
 
       for (let i = 0; i < actorObj.length; i++) {
-
-        let currentIdActor = self.valueExist(array, actorObj[i].id)
-        if (currentIdActor === false) {
-          console.log('test', !self.valueExist(array, currentIdActor), currentIdActor)
+        currentIdActor = this.valueExist(array, actorObj[i].id)
+        if (currentIdActor !== null) {
           array.push(currentIdActor)
         }
-        resolve(actorObj)
+        if ((actorObj.length - 1) === i) {
+          console.log('test', array)
+          resolve(array)
+        }
       }
     })
   }
   callback(that, obj) {
 
-    that.array.push(obj)
     if (obj === false) {
       return
     }
+    that.array.push(obj)
   }
   getCast(movieIds, callback) {
     var self = this
