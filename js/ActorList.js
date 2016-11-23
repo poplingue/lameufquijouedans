@@ -66,7 +66,6 @@ class ActorList extends React.Component {
 
           if (this.readyState === 4) {
             if (this.status === 200) {
-              console.log('this req', this)
             }
           }
         }
@@ -96,16 +95,17 @@ class ActorList extends React.Component {
       }
       let array = []
       let currentIdActor = null
+      let i = 1
 
-      for (let i = 0; i < actorObj.length; i++) {
+      while (i < actorObj.length) {
         currentIdActor = this.valueExist(array, actorObj[i].id)
         if (currentIdActor !== null) {
           array.push(currentIdActor)
         }
-        if ((actorObj.length - 1) === i) {
-          resolve(array)
-        }
+        i++
       }
+      resolve(array)
+
     })
   }
   callback(that, obj) {
