@@ -37,9 +37,9 @@ class ActorList extends React.Component {
       return this.actorFilterDouble(actor)
     })
     var promiseE = promiseD.then((list) => {
-      return this.splitListMaxRequest(list)
-    }).then((list) => {
-      this.actorListObjRequest(list, this.updateList)
+      //return this.splitListMaxRequest(list)
+      //}).then((list) => {
+      return this.actorListObjRequest(list, this.updateList)
     })
 
     return Promise.all([promiseA, promiseB, promiseC, promiseD, promiseE]).then((values) => {
@@ -82,7 +82,6 @@ class ActorList extends React.Component {
           if (this.readyState === 4 && this.status === 200) {
             self.indexLoop++
             if (self.indexLoop === listIds.length) {
-              console.log('test', self.arrayActors)
               resolve(self.arrayActors)
               return
             } else {
