@@ -5,13 +5,16 @@ import Actor from './Actor';
 class ActorList extends React.Component {
   constructor() {
     super()
-    this.btn = document.querySelector('#send');
-    this.list = document.getElementById('list');
-    this.apiKey = '?api_key=148d9341acd58f310f70e4660a4a9add';
-    this.apiUrl = 'https://api.themoviedb.org/3/';
-    this.array = [];
-    this.count = 0;
-    this.launchSearch = this.launchSearch.bind(this);
+    this.btn = document.querySelector('#send')
+    this.list = document.getElementById('list')
+    this.apiKey = '?api_key=148d9341acd58f310f70e4660a4a9add'
+    this.apiUrl = 'https://api.themoviedb.org/3/'
+    this.array = []
+    this.count = 0
+    this.indexLoop = 0
+    this.arrayActors = []
+    this.obj = {}
+    this.launchSearch = this.launchSearch.bind(this)
   }
   launchSearch(e) {
 
@@ -22,7 +25,7 @@ class ActorList extends React.Component {
   }
   getCastMovies() {
 
-    var promiseA = this.movieApi(this.apiUrl + 'search/movie' + this.apiKey + '&query=malcolm')
+    var promiseA = this.movieApi(this.apiUrl + 'search/movie' + this.apiKey + '&query=harry%20potter')
     var promiseB = promiseA.then((movies) => {
       return this.getMovieId(movies)
     })
@@ -36,10 +39,10 @@ class ActorList extends React.Component {
     var promiseE = promiseD.then((list) => {
       return this.splitListMaxRequest(list)
     }).then((list) => {
-      this.actorList(list)
+      this.actorListObjRequest(list, this.updateList)
     })
 
-    return Promise.all([promiseA, promiseB, promiseC, promiseD]).then((values) => {
+    return Promise.all([promiseA, promiseB, promiseC, promiseD, promiseE]).then((values) => {
       console.log('prom all', values)
     }).catch((err) => {
       console.log('catch all', err.message)
@@ -50,22 +53,40 @@ class ActorList extends React.Component {
       resolve(list)
     })
   }
-  actorList(listIds) {
+  updateList(that, name, img) {
+
+    that.obj.name = name
+    that.obj.img = img
+
+    that.arrayActors.push(that.obj)
+
+  }
+  actorListObjRequest(listIds, cb) {
     //make array of objects with name & url image for each actor
+
+    var self = this
     return new Promise((resolve, reject) => {
       let url = ""
       let actorsList = []
       let req = []
 
-      for (var u = 0; u < listIds.length; u++) {
+      for (let u = 0; u < listIds.length; u++) {
         url = this.apiUrl + 'person/' + listIds[u] + this.apiKey
+
         req[u] = new XMLHttpRequest()
+
         req[u].open('GET', url, true)
 
         req[u].onreadystatechange = function () {
 
-          if (this.readyState === 4) {
-            if (this.status === 200) {
+          if (this.readyState === 4 && this.status === 200) {
+            self.indexLoop++
+            if (self.indexLoop === listIds.length) {
+              console.log('test', self.arrayActors)
+              resolve(self.arrayActors)
+              return
+            } else {
+              cb(self, JSON.parse(this.response).name, JSON.parse(this.response).profile_path)
             }
           }
         }
@@ -116,6 +137,7 @@ class ActorList extends React.Component {
     that.array.push(obj)
   }
   getCast(movieIds, callback) {
+    //get casting of each movie
     var self = this
     return new Promise((resolve, reject) => {
 
@@ -135,7 +157,6 @@ class ActorList extends React.Component {
         req[i].onreadystatechange = function () {
 
           if (this.readyState === 4) {
-
             self.count++
 
             if (this.status === 200 && (JSON.parse(this.response).cast).length > 0) {
