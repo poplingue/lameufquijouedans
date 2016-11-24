@@ -31,7 +31,7 @@ class ActorList extends React.Component {
     })
 
     var promiseC = promiseB.then((movieIds) => {
-      return this.getCast(movieIds, this.callback)
+      return this.getCast(movieIds)
     })
     var promiseD = promiseC.then((actor) => {
       return this.actorFilterDouble(actor)
@@ -53,7 +53,7 @@ class ActorList extends React.Component {
       resolve(list)
     })
   }
-  updateList(that, name, img) {
+  updateList(that, {obj}) {
 
     that.obj.name = name
     that.obj.img = img
@@ -72,7 +72,6 @@ class ActorList extends React.Component {
 
       for (let u = 0; u < listIds.length; u++) {
         url = this.apiUrl + 'person/' + listIds[u] + this.apiKey
-
         req[u] = new XMLHttpRequest()
 
         req[u].open('GET', url, true)
@@ -85,7 +84,8 @@ class ActorList extends React.Component {
               resolve(self.arrayActors)
               return
             } else {
-              cb(self, JSON.parse(this.response).name, JSON.parse(this.response).profile_path)
+              cb(self, JSON.parse(this.response))
+              // cb(self, JSON.parse(this.response).name, JSON.parse(this.response).profile_path)
             }
           }
         }
@@ -128,14 +128,7 @@ class ActorList extends React.Component {
 
     })
   }
-  callback(that, obj) {
-
-    if (obj === false) {
-      return
-    }
-    that.array.push(obj)
-  }
-  getCast(movieIds, callback) {
+  getCast(movieIds) {
     //get casting of each movie
     var self = this
     return new Promise((resolve, reject) => {
@@ -163,11 +156,11 @@ class ActorList extends React.Component {
               for (var x = 0; x < (JSON.parse(this.response).cast).length; x++) {
 
                 if (self.count === movieIds.length) {
-                  callback(self, false)
+                  console.log('test', self.array)
                   resolve(self.array)
                   return
                 } else {
-                  callback(self, JSON.parse(this.response).cast[x])
+                  self.array.push(JSON.parse(this.response).cast[x])
                 }
               }
             }
