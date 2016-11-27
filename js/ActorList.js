@@ -3,8 +3,8 @@ import { render } from 'react-dom';
 import Actor from './Actor';
 
 class ActorList extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.btn = document.querySelector('#send')
     this.list = document.getElementById('list')
     this.apiKey = '?api_key=148d9341acd58f310f70e4660a4a9add'
@@ -14,18 +14,23 @@ class ActorList extends React.Component {
     this.indexLoop = 0
     this.arrayActors = []
     this.obj = {}
+
+    this.state = {
+      "result": []
+    }
     this.launchSearch = this.launchSearch.bind(this)
   }
   launchSearch(e) {
 
     e.preventDefault()
-    this.getCastMovies().then(() => {
+    this.getCastMovies().then((result) => {
       console.log('toutouyoutou')
+      this.setState({ "result": result })
     })
   }
   getCastMovies() {
 
-    var promiseA = this.movieApi(this.apiUrl + 'search/movie' + this.apiKey + '&query=harry%20potter')
+    var promiseA = this.movieApi(this.apiUrl + 'search/movie' + this.apiKey + '&query=snatch')
     var promiseB = promiseA.then((movies) => {
       return this.getMovieId(movies)
     })
@@ -39,11 +44,11 @@ class ActorList extends React.Component {
     var promiseE = promiseD.then((list) => {
       //return this.splitListMaxRequest(list)
       //}).then((list) => {
-      return this.actorListObjRequest(list, this.updateList)
+      return this.actorListObjRequest(list, this.updateList, this.nextFourty)
     })
 
     return Promise.all([promiseA, promiseB, promiseC, promiseD, promiseE]).then((values) => {
-      console.log('prom all', values)
+      return values[4]
     }).catch((err) => {
       console.log('catch all', err.message)
     })
@@ -53,15 +58,19 @@ class ActorList extends React.Component {
       resolve(list)
     })
   }
-  updateList(that, {obj}) {
+  updateList(that, obj) {
 
-    that.obj.name = name
-    that.obj.img = img
-
+    that.obj = {
+      "name": obj.name,
+      "img": obj.profile_path
+    }
     that.arrayActors.push(that.obj)
 
   }
-  actorListObjRequest(listIds, cb) {
+  nextFourty() {
+    console.log('nextFourty')
+  }
+  actorListObjRequest(listIds, cb, nextFourty) {
     //make array of objects with name & url image for each actor
 
     var self = this
@@ -69,6 +78,8 @@ class ActorList extends React.Component {
       let url = ""
       let actorsList = []
       let req = []
+
+      console.log('test', listIds.length)
 
       for (let u = 0; u < listIds.length; u++) {
         url = this.apiUrl + 'person/' + listIds[u] + this.apiKey
@@ -80,12 +91,15 @@ class ActorList extends React.Component {
 
           if (this.readyState === 4 && this.status === 200) {
             self.indexLoop++
-            if (self.indexLoop === listIds.length) {
+            if (self.indexLoop > 40) {
+              nextFourty(self.indexLoop)
               resolve(self.arrayActors)
               return
             } else {
               cb(self, JSON.parse(this.response))
-              // cb(self, JSON.parse(this.response).name, JSON.parse(this.response).profile_path)
+            }
+
+            if (self.indexLoop === listIds.length) {
             }
           }
         }
@@ -108,7 +122,6 @@ class ActorList extends React.Component {
     }
   }
   actorFilterDouble(actorObj) {
-
     return new Promise((resolve, reject) => {
       if (actorObj.length === 0) {
         reject(new Err('no result'))
@@ -155,12 +168,11 @@ class ActorList extends React.Component {
 
               for (var x = 0; x < (JSON.parse(this.response).cast).length; x++) {
 
+                self.array.push(JSON.parse(this.response).cast[x])
+
                 if (self.count === movieIds.length) {
-                  console.log('test', self.array)
                   resolve(self.array)
                   return
-                } else {
-                  self.array.push(JSON.parse(this.response).cast[x])
                 }
               }
             }
@@ -208,7 +220,6 @@ class ActorList extends React.Component {
     })
   }
   render() {
-
     return (
       <div>
         <form onSubmit={this.launchSearch}>
@@ -216,7 +227,9 @@ class ActorList extends React.Component {
           <input type="submit" value="search" id="send" />
         </form>
         <ul>
-          <li><Actor /></li>
+          {this.state.result.map(function (resultValue, id) {
+            return <li key={id}><Actor img={resultValue.img} name={resultValue.name} /></li>;
+          })}
         </ul>
       </div>)
   }
