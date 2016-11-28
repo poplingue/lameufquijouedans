@@ -1,6 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import Actor from './Actor';
+import Movie from './Movie';
 
 class ActorList extends React.Component {
   constructor(props) {
@@ -16,7 +17,8 @@ class ActorList extends React.Component {
     this.obj = {}
 
     this.state = {
-      "result": []
+      "result": [],
+      'movie': []
     }
     this.launchSearch = this.launchSearch.bind(this)
   }
@@ -93,7 +95,8 @@ class ActorList extends React.Component {
 
           if (this.readyState === 4 && this.status === 200) {
             self.indexLoop++
-            if (self.indexLoop === 40) {
+
+            if (self.indexLoop === (listIds.length - 1)) {
               resolve(self.arrayActors)
               return
             } else {
@@ -200,7 +203,7 @@ class ActorList extends React.Component {
     })
   }
   movieApi(url) {
-
+    var self = this
     return new Promise((resolve, reject) => {
       //request from query movie
       var httpRequest = new XMLHttpRequest()
@@ -210,6 +213,8 @@ class ActorList extends React.Component {
         if (this.readyState === 4) {
 
           if (this.status === 200) {
+            self.setState({ 'movie': JSON.parse(this.responseText).results })
+
             //return list of movies
             resolve(JSON.parse(this.responseText).results)
           } else {
@@ -227,6 +232,11 @@ class ActorList extends React.Component {
           <input type="text" placeholder='query' id="query" />
           <input type="submit" value="search" id="send" />
         </form>
+        <ul>
+          {this.state.movie.map(function (movie, id) {
+            return <li key={id}><Movie movie={movie.original_title} /></li>;
+          })}
+        </ul>
         <ul>
           {this.state.result.map(function (resultValue, id) {
             return <li key={id}><Actor img={resultValue.img} name={resultValue.name} /></li>;
