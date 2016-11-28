@@ -6,7 +6,7 @@ class Actor extends React.Component {
     return (
       <div>
         <div>{this.props.name}</div>
-        <img src={'https://image.tmdb.org/t/p/w500' + this.props.img} />
+        <img src={this.props.img ? 'https://image.tmdb.org/t/p/w154' + this.props.img : 'http://lorempixel.com/154/231/animals/'} />
       </div>)
 
   }

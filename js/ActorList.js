@@ -44,7 +44,7 @@ class ActorList extends React.Component {
     var promiseE = promiseD.then((list) => {
       //return this.splitListMaxRequest(list)
       //}).then((list) => {
-      return this.actorListObjRequest(list, this.updateList, this.nextFourty)
+      return this.actorListObjRequest(list, this.saveActor)
     })
 
     return Promise.all([promiseA, promiseB, promiseC, promiseD, promiseE]).then((values) => {
@@ -58,19 +58,23 @@ class ActorList extends React.Component {
       resolve(list)
     })
   }
-  updateList(that, obj) {
-
+  saveActor(that, obj, list, id) {
+    //push img & name of actor in array
     that.obj = {
       "name": obj.name,
       "img": obj.profile_path
     }
     that.arrayActors.push(that.obj)
 
+    //delete id from listIds when request ok
+    list.forEach((item, index, object) => {
+      if (item === id) {
+        object.splice(index, 1);
+      }
+    })
+
   }
-  nextFourty() {
-    console.log('nextFourty')
-  }
-  actorListObjRequest(listIds, cb, nextFourty) {
+  actorListObjRequest(listIds, saveActor, updateList) {
     //make array of objects with name & url image for each actor
 
     var self = this
@@ -78,8 +82,6 @@ class ActorList extends React.Component {
       let url = ""
       let actorsList = []
       let req = []
-
-      console.log('test', listIds.length)
 
       for (let u = 0; u < listIds.length; u++) {
         url = this.apiUrl + 'person/' + listIds[u] + this.apiKey
@@ -91,12 +93,11 @@ class ActorList extends React.Component {
 
           if (this.readyState === 4 && this.status === 200) {
             self.indexLoop++
-            if (self.indexLoop > 40) {
-              nextFourty(self.indexLoop)
+            if (self.indexLoop === 40) {
               resolve(self.arrayActors)
               return
             } else {
-              cb(self, JSON.parse(this.response))
+              saveActor(self, JSON.parse(this.response), listIds, listIds[u])
             }
 
             if (self.indexLoop === listIds.length) {
