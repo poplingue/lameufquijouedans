@@ -11,179 +11,83 @@ class App extends React.Component {
     this.apiKey = '?api_key=148d9341acd58f310f70e4660a4a9add'
     this.apiUrl = 'https://api.themoviedb.org/3/'
     this.array = []
-    this.count = 0
-    this.indexLoop = 0
     this.arrayActors = []
     this.obj = {}
 
     this.state = {
       "result": [],
-      'movie': []
+      'movieList': []
     }
-    this.launchSearch = this.launchSearch.bind(this)
+    this.searchMovies = this.searchMovies.bind(this)
   }
-  launchSearch(e) {
-
+  searchMovies(e) {
     e.preventDefault()
-    this.getCastMovies().then((result) => {
-      console.log('toutouyoutou')
+    this.getMovies(this.apiUrl + 'search/movie' + this.apiKey + '&query=harry%20potter')
+      .then((movies) => {
+        this.setState({ 'movieList': movies })
+      })
+  }
+  searchCast(movieId) {
+
+    this.getCast(movieId).then((casting) => {
+      return this.saveActor(casting)
+    }).then((result) => {
+      console.log(result)
       this.setState({ "result": result })
     })
   }
-  getCastMovies() {
+  saveActor(casting) {
 
-    var promiseA = this.movieApi(this.apiUrl + 'search/movie' + this.apiKey + '&query=snatch')
-    var promiseB = promiseA.then((movies) => {
-      return this.getMovieId(movies)
-    })
-
-    var promiseC = promiseB.then((movieIds) => {
-      return this.getCast(movieIds)
-    })
-    var promiseD = promiseC.then((actor) => {
-      return this.actorFilterDouble(actor)
-    })
-    var promiseE = promiseD.then((list) => {
-      //return this.splitListMaxRequest(list)
-      //}).then((list) => {
-      return this.actorListObjRequest(list, this.saveActor)
-    })
-
-    return Promise.all([promiseA, promiseB, promiseC, promiseD, promiseE]).then((values) => {
-      return values[4]
-    }).catch((err) => {
-      console.log('catch all', err.message)
-    })
-  }
-  splitListMaxRequest(list) {
     return new Promise((resolve, reject) => {
-      resolve(list)
-    })
-  }
-  saveActor(that, obj, list, id) {
-    //push img & name of actor in array
-    that.obj = {
-      "name": obj.name,
-      "img": obj.profile_path
-    }
-    that.arrayActors.push(that.obj)
 
-    //delete id from listIds when request ok
-    list.forEach((item, index, object) => {
-      if (item === id) {
-        object.splice(index, 1);
-      }
-    })
-
-  }
-  actorListObjRequest(listIds, saveActor, updateList) {
-    //make array of objects with name & url image for each actor
-
-    var self = this
-    return new Promise((resolve, reject) => {
-      let url = ""
-      let actorsList = []
-      let req = []
-
-      for (let u = 0; u < listIds.length; u++) {
-        url = this.apiUrl + 'person/' + listIds[u] + this.apiKey
-        req[u] = new XMLHttpRequest()
-
-        req[u].open('GET', url, true)
-
-        req[u].onreadystatechange = function () {
-
-          if (this.readyState === 4 && this.status === 200) {
-            self.indexLoop++
-
-            if (self.indexLoop === (listIds.length - 1)) {
-              resolve(self.arrayActors)
-              return
-            } else {
-              saveActor(self, JSON.parse(this.response), listIds, listIds[u])
-            }
-
-            if (self.indexLoop === listIds.length) {
-            }
-          }
+      for (let i = 0; i < casting.length; i++) {
+        this.obj = {
+          "name": casting[i].name,
+          "img": casting[i].profile_path
         }
-        req[u].send()
+        this.arrayActors.push(this.obj)
+
+        setTimeout(() => {
+          resolve(this.arrayActors)
+        }, 0);
+
       }
     })
   }
-  valueExist(array, id) {
-    //return value if not yet in array
-    if (array.length === 0) {
-      return id
-    }
-    for (var j = 0; j < array.length; j++) {
-      if (id === array[j]) {
-        return null
-      }
-      if (j === (array.length - 1)) {
-        return id
-      }
-    }
-  }
-  actorFilterDouble(actorObj) {
-    return new Promise((resolve, reject) => {
-      if (actorObj.length === 0) {
-        reject(new Err('no result'))
-      }
-      let array = []
-      let currentIdActor = null
-      let i = 1
+  getCast(movieId) {
 
-      while (i < actorObj.length) {
-        currentIdActor = this.valueExist(array, actorObj[i].id)
-        if (currentIdActor !== null) {
-          array.push(currentIdActor)
-        }
-        i++
-      }
-      resolve(array)
-
-    })
-  }
-  getCast(movieIds) {
-    //get casting of each movie
-    var self = this
+    let self = this
     return new Promise((resolve, reject) => {
 
-      if (movieIds.length === 0) {
-        reject(new Error("no result"))
+      if (!movieId) {
+        reject(new Error("no movie id"))
       }
 
       let url = ""
-      let req = []
+      let req = new XMLHttpRequest()
 
-      for (var i = 0; i < movieIds.length; i++) {
+      url = self.apiUrl + 'movie/' + movieId + '/credits' + self.apiKey
+      req.open('GET', url, true)
 
-        req[i] = new XMLHttpRequest()
-        url = self.apiUrl + 'movie/' + movieIds[i] + '/credits' + self.apiKey
-        req[i].open('GET', url, true)
+      req.onreadystatechange = function () {
 
-        req[i].onreadystatechange = function () {
+        if (this.readyState === 4) {
 
-          if (this.readyState === 4) {
-            self.count++
+          if (this.status === 200 && (JSON.parse(this.response).cast).length > 0) {
 
-            if (this.status === 200 && (JSON.parse(this.response).cast).length > 0) {
+            for (let x = 0; x < (JSON.parse(this.response).cast).length; x++) {
+              self.array.push(JSON.parse(this.response).cast[x])
 
-              for (var x = 0; x < (JSON.parse(this.response).cast).length; x++) {
+              // need to wait the end of loop to resolve the promise
+              setTimeout(() => {
+                resolve(self.array)
+              }, 0)
 
-                self.array.push(JSON.parse(this.response).cast[x])
-
-                if (self.count === movieIds.length) {
-                  resolve(self.array)
-                  return
-                }
-              }
             }
           }
         }
-        req[i].send()
       }
+      req.send()
     })
   }
   getMovieId(movies) {
@@ -202,7 +106,7 @@ class App extends React.Component {
       }
     })
   }
-  movieApi(url) {
+  getMovies(url) {
     var self = this
     return new Promise((resolve, reject) => {
       //request from query movie
@@ -213,9 +117,6 @@ class App extends React.Component {
         if (this.readyState === 4) {
 
           if (this.status === 200) {
-            self.setState({ 'movie': JSON.parse(this.responseText).results })
-
-            //return list of movies
             resolve(JSON.parse(this.responseText).results)
           } else {
             reject(new Error("status response : " + this.status))
@@ -228,17 +129,17 @@ class App extends React.Component {
   render() {
     return (
       <div>
-        <form onSubmit={this.launchSearch}>
+        <form onSubmit={this.searchMovies}>
           <input type="text" placeholder='query' id="query" />
           <input type="submit" value="search" id="send" />
         </form>
         <ul>
-          {this.state.movie.map(function (movie, id) {
-            return <li key={id}><Movie movie={movie.original_title} /></li>;
+          {this.state.movieList.map((movie, id) => {
+            return <li onClick={this.searchCast.bind(this, movie.id)} key={id}><Movie movie={movie.original_title} /></li>;
           })}
         </ul>
         <ul>
-          {this.state.result.map(function (resultValue, id) {
+          {this.state.result.map((resultValue, id) => {
             return <li key={id}><Actor img={resultValue.img} name={resultValue.name} /></li>;
           })}
         </ul>
