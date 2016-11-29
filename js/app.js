@@ -4,10 +4,9 @@ import Actor from './Actor';
 import Movie from './Movie';
 
 class App extends React.Component {
+
   constructor(props) {
     super(props)
-    this.btn = document.querySelector('#send')
-    this.list = document.getElementById('list')
     this.apiKey = '?api_key=148d9341acd58f310f70e4660a4a9add'
     this.apiUrl = 'https://api.themoviedb.org/3/'
     this.array = []
@@ -15,40 +14,54 @@ class App extends React.Component {
     this.obj = {}
 
     this.state = {
-      "result": [],
-      'movieList': []
+      result: [],
+      movieList: [],
+      value: ""
     }
+
     this.searchMovies = this.searchMovies.bind(this)
+    this.handleChange = this.handleChange.bind(this)
+  }
+  handleChange(event) {
+    this.setState({ value: event.target.value });
   }
   searchMovies(e) {
     e.preventDefault()
-    this.getMovies(this.apiUrl + 'search/movie' + this.apiKey + '&query=harry%20potter')
+    let query = this.transformValueToQuery(this.state.value)
+    this.getMovies(this.apiUrl + 'search/movie' + this.apiKey + '&query=' + query)
       .then((movies) => {
-        this.setState({ 'movieList': movies })
+        this.setState({ movieList: movies })
       })
   }
+  transformValueToQuery(value) {
+    return value
+  }
   searchCast(movieId) {
-
     this.getCast(movieId).then((casting) => {
-      return this.saveActor(casting)
+      return this.updateArrayActors(casting)
     }).then((result) => {
-      console.log(result)
-      this.setState({ "result": result })
+      console.log('result then', result.length)
+      // document.querySelector('.actor-list').innerHTML = null
+      this.setState({ result: [] })
+      this.setState({ result: result })
     })
   }
-  saveActor(casting) {
+  updateArrayActors(casting) {
 
     return new Promise((resolve, reject) => {
-
+      var arrayActors = []
+      var obj = {}
       for (let i = 0; i < casting.length; i++) {
-        this.obj = {
+        obj = {
           "name": casting[i].name,
           "img": casting[i].profile_path
         }
-        this.arrayActors.push(this.obj)
+        console.log('length', arrayActors.length)
+        arrayActors.push(obj)
 
         setTimeout(() => {
-          resolve(this.arrayActors)
+          resolve(arrayActors)
+          return
         }, 0);
 
       }
@@ -109,7 +122,7 @@ class App extends React.Component {
   getMovies(url) {
     var self = this
     return new Promise((resolve, reject) => {
-      //request from query movie
+      //request from value movie
       var httpRequest = new XMLHttpRequest()
       httpRequest.open('GET', url)
 
@@ -130,15 +143,15 @@ class App extends React.Component {
     return (
       <div>
         <form onSubmit={this.searchMovies}>
-          <input type="text" placeholder='query' id="query" />
+          <input type="text" placeholder='value' id="value" value={this.state.value} onChange={this.handleChange} />
           <input type="submit" value="search" id="send" />
         </form>
-        <ul>
+        <ul className='movie-list'>
           {this.state.movieList.map((movie, id) => {
             return <li onClick={this.searchCast.bind(this, movie.id)} key={id}><Movie movie={movie.original_title} /></li>;
           })}
         </ul>
-        <ul>
+        <ul className='actor-list'>
           {this.state.result.map((resultValue, id) => {
             return <li key={id}><Actor img={resultValue.img} name={resultValue.name} /></li>;
           })}
