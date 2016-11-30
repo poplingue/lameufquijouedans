@@ -16,27 +16,38 @@ class App extends React.Component {
     this.state = {
       actorList: [],
       movieList: [],
-      value: ""
+      search: ""
     }
 
     this.searchMovies = this.searchMovies.bind(this)
-    this.handleChange = this.handleChange.bind(this)
-  }
-  handleChange(event) {
-    this.setState({ value: event.target.value });
   }
   searchMovies(e) {
     e.preventDefault()
-    let query = this.transformValueToQuery(this.state.value)
-    this.getMovies(this.apiUrl + 'search/movie' + this.apiKey + '&query=' + query)
-      .then((movies) => {
-        this.setState({ movieList: movies })
-      })
+
+    let search = (e.type === 'submit') ? this.state.search : e.target.value
+    this.setState({ search: search })
+
+    if (search.length > 1) {
+
+      let query = this.transformValueToQuery(search)
+
+      this.getMovies(this.apiUrl + 'search/movie' + this.apiKey + '&query=' + query)
+        .then((movies) => {
+          this.setState({ movieList: movies })
+        })
+    }
   }
   transformValueToQuery(value) {
-    return value
+    let c = ''
+    let a = []
+    for (let i = 0; i < value.length; i++) {
+      c = (value[i] === ' ') ? '%20' : value[i]
+      a.push(c)
+    }
+    return a.join('')
   }
   searchCast(movieId) {
+    this.setState({ movieList: [] })
     this.getCast(movieId).then((casting) => {
       return this.updateArrayActors(casting)
     }).then((actorList) => {
@@ -49,7 +60,7 @@ class App extends React.Component {
 
     return new Promise((resolve, reject) => {
       let arrayActors = []
-      var obj = {}
+      let obj = {}
 
       for (let i = 0; i < casting.length; i++) {
         obj = {
@@ -141,12 +152,12 @@ class App extends React.Component {
     return (
       <div>
         <form onSubmit={this.searchMovies}>
-          <input type="text" placeholder='value' id="value" value={this.state.value} onChange={this.handleChange} />
+          <input type="text" autoComplete="off" placeholder='value' id="value" value={this.state.value} onChange={this.searchMovies} />
           <input type="submit" value="search" id="send" />
         </form>
         <ul className='movie-list'>
           {this.state.movieList.map((movie, id) => {
-            return <li onClick={this.searchCast.bind(this, movie.id)} key={id}><Movie movie={movie.original_title} /></li>;
+            return <li onClick={this.searchCast.bind(this, movie.id)} key={id}><Movie poster={movie.poster_path} movie={movie.original_title} /></li>;
           })}
         </ul>
         <ul className='actor-list'>
