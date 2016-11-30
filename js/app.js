@@ -27,15 +27,14 @@ class App extends React.Component {
     let search = (e.type === 'submit') ? this.state.search : e.target.value
     this.setState({ search: search })
 
-    if (search.length > 1) {
+    this.query = this.transformValueToQuery(search)
 
-      let query = this.transformValueToQuery(search)
-
-      this.getMovies(this.apiUrl + 'search/movie' + this.apiKey + '&query=' + query)
-        .then((movies) => {
-          this.setState({ movieList: movies })
-        })
-    }
+    this.getMovies(this.apiUrl + 'search/movie' + this.apiKey + '&query=' + this.query)
+      .then((movies) => {
+        this.setState({ movieList: movies })
+      }).catch((err) => {
+        console.log(err)
+      })
   }
   transformValueToQuery(value) {
     let c = ''
@@ -47,6 +46,7 @@ class App extends React.Component {
     return a.join('')
   }
   searchCast(movieId) {
+
     this.setState({ movieList: [] })
     this.getCast(movieId).then((casting) => {
       return this.updateArrayActors(casting)
@@ -112,43 +112,33 @@ class App extends React.Component {
       req.send()
     })
   }
-  getMovieId(movies) {
-
-    return new Promise((resolve, reject) => {
-      var arrayIds = []
-
-      if (movies.length === 0) {
-        reject(new Error("aucun résulat"))
-      } else {
-        //create array of all id movies
-        for (let index = 0; index < movies.length; index++) {
-          arrayIds.push(movies[index].id)
-        }
-        resolve(arrayIds)
-      }
-    })
-  }
   getMovies(url) {
     var self = this
     return new Promise((resolve, reject) => {
-      //request from value movie
-      var httpRequest = new XMLHttpRequest()
-      httpRequest.open('GET', url)
 
-      httpRequest.onreadystatechange = function () {
-        if (this.readyState === 4) {
+      if (this.query) {
+        //request from value movie
+        var httpRequest = new XMLHttpRequest()
+        httpRequest.open('GET', url)
 
-          if (this.status === 200) {
-            resolve(JSON.parse(this.responseText).results)
-          } else {
-            reject(new Error("status response : " + this.status))
+        httpRequest.onreadystatechange = function () {
+          if (this.readyState === 4) {
+
+            if (this.status === 200) {
+              resolve(JSON.parse(this.responseText).results)
+            } else {
+              reject(new Error("status response : " + this.status))
+            }
           }
         }
+        httpRequest.send()
+      } else {
+        reject('write something')
       }
-      httpRequest.send()
     })
   }
   render() {
+
     return (
       <div>
         <form onSubmit={this.searchMovies}>
