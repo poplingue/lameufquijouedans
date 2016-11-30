@@ -14,7 +14,7 @@ class App extends React.Component {
     this.obj = {}
 
     this.state = {
-      result: [],
+      actorList: [],
       movieList: [],
       value: ""
     }
@@ -39,31 +39,29 @@ class App extends React.Component {
   searchCast(movieId) {
     this.getCast(movieId).then((casting) => {
       return this.updateArrayActors(casting)
-    }).then((result) => {
-      console.log('result then', result.length)
-      // document.querySelector('.actor-list').innerHTML = null
-      this.setState({ result: [] })
-      this.setState({ result: result })
+    }).then((actorList) => {
+      // need empty the list
+      document.querySelector('.actor-list').innerHTML = null
+      this.setState({ actorList: actorList })
     })
   }
   updateArrayActors(casting) {
 
     return new Promise((resolve, reject) => {
-      var arrayActors = []
+      let arrayActors = []
       var obj = {}
+
       for (let i = 0; i < casting.length; i++) {
         obj = {
           "name": casting[i].name,
           "img": casting[i].profile_path
         }
-        console.log('length', arrayActors.length)
         arrayActors.push(obj)
 
-        setTimeout(() => {
+        if (casting.length === arrayActors.length) {
           resolve(arrayActors)
           return
-        }, 0);
-
+        }
       }
     })
   }
@@ -152,8 +150,8 @@ class App extends React.Component {
           })}
         </ul>
         <ul className='actor-list'>
-          {this.state.result.map((resultValue, id) => {
-            return <li key={id}><Actor img={resultValue.img} name={resultValue.name} /></li>;
+          {this.state.actorList.map((actor, id) => {
+            return <li key={id}><Actor img={actor.img} name={actor.name} /></li>;
           })}
         </ul>
       </div>)
