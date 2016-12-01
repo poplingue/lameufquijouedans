@@ -4,6 +4,7 @@
   "description": "api connexion to find any actor your forgot the name",
   "main": "app.js",
   "scripts": {
+    "watch": "webpack --watch --progress",
     "test": "mocha --compilers .:js/test/compiler.js js/test/*test.js"
   },
   "repository": {
@@ -21,14 +22,21 @@
   },
   "homepage": "https://github.com/francasix/lameufquijouedans#readme",
   "devDependencies": {
+    "autoprefixer": "^6.5.3",
     "babel-core": "^6.14.0",
     "babel-loader": "^6.2.5",
     "babel-preset-es2015": "^6.14.0",
     "babel-preset-react": "^6.16.0",
     "babel-register": "^6.14.0",
+    "css-loader": "^0.26.0",
+    "extract-text-webpack-plugin": "^1.0.1",
     "graceful-fs": "^4.1.10",
     "jsdom": "^9.8.3",
     "mocha": "^3.1.2",
+    "node-sass": "^3.13.0",
+    "postcss-loader": "^1.1.1",
+    "sass-loader": "^4.0.2",
+    "style-loader": "^0.13.1",
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.16.2"
   },
