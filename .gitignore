@@ -1,4 +1,6 @@
 /node_modules
-/js/output/lameufquijouedans.bundle.js
-/js/output/lameufquijouedans.bundle.js.map
+/js/output/bundle.js
+/js/output/bundle.js.map
+/css/output/style.css
+/css/output/style.css.map
 .vscode

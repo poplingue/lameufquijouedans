@@ -54,6 +54,7 @@ class App extends React.Component {
       return this.updateArrayActors(casting)
     }).then((actorList) => {
       // need empty the list
+
       this.setState({ actorList: actorList })
     })
   }
@@ -142,7 +143,7 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
+      <div >
         <form onSubmit={this.searchMovies}>
           <input type="text" autoComplete="off" placeholder='value' id="value" value={this.state.value} onChange={this.searchMovies} />
           <input type="submit" value="search" id="send" />
@@ -159,7 +160,7 @@ class App extends React.Component {
             </li>;
           })}
         </ul>
-      </div>)
+      </div >)
   }
 }
 export default App;
