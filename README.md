@@ -7,7 +7,7 @@ Find actor who played in a movie
 `npm run watch`
 
 ## launch webpack server
-`webpack-dev-server`
+`npm run serve`
 
 ### keywords
 - webpack

@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "watch": "webpack --watch --progress",
+    "serve": "webpack-dev-server",
     "test": "mocha --compilers .:js/test/compiler.js js/test/*test.js"
   },
   "repository": {

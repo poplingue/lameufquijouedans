@@ -1,5 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
+import _ from 'underscore'
 import Actor from './Actor';
 import Movie from './Movie';
 
@@ -14,9 +15,10 @@ class App extends React.Component {
     this.obj = {}
 
     this.state = {
-      actorList: [],
       movieList: [],
-      search: ""
+      actorList: [],
+      search: "",
+      currentMovie: null
     }
 
     this.searchMovies = this.searchMovies.bind(this)
@@ -45,14 +47,13 @@ class App extends React.Component {
     }
     return a.join('')
   }
-  searchCast(movieId) {
+  searchCast(movieId, id) {
 
-    this.setState({ movieList: [] })
+    this.setState({ currentMovie: id })
     this.getCast(movieId).then((casting) => {
       return this.updateArrayActors(casting)
     }).then((actorList) => {
       // need empty the list
-      document.querySelector('.actor-list').innerHTML = null
       this.setState({ actorList: actorList })
     })
   }
@@ -87,6 +88,7 @@ class App extends React.Component {
 
       let url = ""
       let req = new XMLHttpRequest()
+      self.array = []
 
       url = self.apiUrl + 'movie/' + movieId + '/credits' + self.apiKey
       req.open('GET', url, true)
@@ -137,8 +139,8 @@ class App extends React.Component {
       }
     })
   }
-  render() {
 
+  render() {
     return (
       <div>
         <form onSubmit={this.searchMovies}>
@@ -147,12 +149,14 @@ class App extends React.Component {
         </form>
         <ul className='movie-list'>
           {this.state.movieList.map((movie, id) => {
-            return <li onClick={this.searchCast.bind(this, movie.id)} key={id}><Movie poster={movie.poster_path} movie={movie.original_title} /></li>;
-          })}
-        </ul>
-        <ul className='actor-list'>
-          {this.state.actorList.map((actor, id) => {
-            return <li key={id}><Actor img={actor.img} name={actor.name} /></li>;
+            return <li onClick={this.searchCast.bind(this, movie.id, id)} key={id}>
+              <Movie
+                id={id}
+                currentMovie={this.state.currentMovie}
+                poster={movie.poster_path}
+                movie={movie.original_title}
+                actorList={this.state.actorList} />
+            </li>;
           })}
         </ul>
       </div>)
