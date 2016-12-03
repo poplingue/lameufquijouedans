@@ -1,6 +1,5 @@
 import React from 'react';
 import { render } from 'react-dom';
-import _ from 'underscore'
 import Actor from './Actor';
 import Movie from './Movie';
 
@@ -49,13 +48,10 @@ class App extends React.Component {
   }
   searchCast(movieId, id) {
 
-    this.setState({ currentMovie: id })
     this.getCast(movieId).then((casting) => {
       return this.updateArrayActors(casting)
     }).then((actorList) => {
-      // need empty the list
-
-      this.setState({ actorList: actorList })
+      this.setState({ currentMovie: id, actorList: actorList })
     })
   }
   updateArrayActors(casting) {

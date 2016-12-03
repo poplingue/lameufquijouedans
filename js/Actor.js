@@ -7,7 +7,6 @@ class Actor extends React.Component {
     this.state = {
       visible: true
     }
-    console.log('constructor', this.state.visible)
   }
   render() {
     return (
@@ -15,14 +14,11 @@ class Actor extends React.Component {
         <p>{this.props.name}</p>
         <img src={this.props.img ? 'https://image.tmdb.org/t/p/w154' + this.props.img : 'http://lorempixel.com/154/231/animals/'} />
       </div>)
-
   }
-  componentDidUpdate(prevProps) {
-    if (this.state.visible) {
-      this.setState({
-        visible: !this.state.visible
-      })
-    }
+  componentDidMount() {
+    // console.log('test', document.querySelectorAll('.actor-list li div')[0])
+    document.querySelectorAll('.actor-list li div')[0].classList.remove('on')
+    document.querySelectorAll('.actor-list li div').className = 'off'
   }
 }
 export default Actor;
