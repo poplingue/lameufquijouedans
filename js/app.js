@@ -139,10 +139,10 @@ class App extends React.Component {
 
   render() {
     return (
-      <div >
+      <div id="wrap-form">
         <form onSubmit={this.searchMovies}>
-          <input type="text" autoComplete="off" placeholder='value' id="value" value={this.state.value} onChange={this.searchMovies} />
-          <input type="submit" value="search" id="send" />
+          <input type="text" autoComplete="off" placeholder='Billy Elliot, Titanic...' id="value" value={this.state.value} onChange={this.searchMovies} />
+          <input type="submit" value="" id="send" />
         </form>
         <ul className='movie-list'>
           {this.state.movieList.map((movie, id) => {

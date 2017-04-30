@@ -1,5 +1,7 @@
+$yellow: #f9d21d
+
 body
-  background: #fff
+  background: $yellow
 
 li
   list-style-type: none
@@ -24,3 +26,33 @@ li
 .off
   transition: all 1s linear
   opacity: 0
+
+.container
+  background: url('/image/bg_popcorn.png') no-repeat
+  height: 100vh
+  width: 100%
+  background-position: 50% 0
+
+#wrap-form
+  position: absolute
+  width: calc(100% - 24px)
+  text-align: center
+  top: 70%
+  form input
+    border: none
+    padding: 10px
+    font-family: 'Montserrat', sans-serif
+    font-size: 20px
+    width: 310px;
+    height: 36px;
+  input
+    &[type="submit"]
+      background-color: #000
+      position: relative
+      background-image: url('/image/search.png')
+      background-repeat: no-repeat
+      height: 56px
+      width: 37px
+      padding: 21px 28px
+      background-position: 9px 12px
+
