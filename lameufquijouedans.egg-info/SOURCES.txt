@@ -1,0 +1,7 @@
+lameufquijouedans/__init__.py
+lameufquijouedans/views.py
+lameufquijouedans.egg-info/PKG-INFO
+lameufquijouedans.egg-info/SOURCES.txt
+lameufquijouedans.egg-info/dependency_links.txt
+lameufquijouedans.egg-info/requires.txt
+lameufquijouedans.egg-info/top_level.txt

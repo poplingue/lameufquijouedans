@@ -1,37 +1,43 @@
-# Backend
-start rabbit MQ
-`rabbitmq-server`
-
-start python Flask server
-`python3 server.py`
-
-start celery consumer task
-`celery -A server.celery worker --loglevel=debug`
-
-call the task via Flask route
-`http://localhost:5000/harry`
-
 # lameufquijouedans
 Find actor who played in a movie
 
+## Backend
+### start rabbit MQ
+`rabbitmq-server`
+
+### init app (to do once)
+`sh init_app.sh`
+
+### start python Flask server
+`flask run`
+
+### start celery consumer task
+`cd /celery`
+
+`celery -A tasks:celery worker --loglevel=info`
+
+### call the task via Flask route
+`http://localhost:5000/harry`
+
+## Frontend
 `npm i`
 
-## launch watch builder
+### launch watch builder
 `npm run watch`
 
-## launch webpack server
+### launch webpack server
 `npm run serve`
 
-### keywords
+#### keywords
 - webpack
 - React
 - ES6
 - sass
 
-### Repo / Helper
+#### Repo / Helper
 - https://github.com/bensmithett/webpack-css-example
 
-### TODO
+#### TODO
 - add tv
 - catch errors
 - trier results
