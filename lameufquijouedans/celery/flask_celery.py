@@ -1,10 +1,10 @@
+import celeryconfig
 from celery import Celery
-import sys
 
 def make_celery(app):
-    celery = Celery()
 
-    celery.config_from_object('celery')
+    celery = Celery()
+    celery.config_from_object(celeryconfig)
 
     TaskBase = celery.Task
 
