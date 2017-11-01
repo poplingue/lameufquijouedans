@@ -1,14 +1,6 @@
 from lameufquijouedans import app
 from flask import Flask
 from lameufquijouedans.celery.flask_celery import make_celery
-import celeryconfig
-
-# app.config.update(
-#     CELERY_BROKER_URL='amqp://guest@localhost//',
-#     CELERY_BACKEND='db+mysql://tasks:root@localhost:3306/tasks'
-# )
-
-# app.config.update(celeryconfig)
 
 celery = make_celery(app)
 

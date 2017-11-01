@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-export FLASK_APP=lameufquijourdans
+export FLASK_APP=lameufquijouedans
 export FLASK_DEBUG=true
-pip3 install -e .
+sudo pip3 install -e .

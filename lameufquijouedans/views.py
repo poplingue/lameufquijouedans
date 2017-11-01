@@ -15,6 +15,5 @@ apiKey = '?api_key=148d9341acd58f310f70e4660a4a9add'
 def get_movie():
     with urllib.request.urlopen(apiUrl + 'search/movie' + apiKey + '&query=harry%20potter') as response:
         html = response.read().decode('utf-8')
-
     t.check.delay(json.dumps([html]))
     return 'Async request sent!'

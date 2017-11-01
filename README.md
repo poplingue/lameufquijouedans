@@ -6,7 +6,7 @@ Find actor who played in a movie
 `rabbitmq-server`
 
 ### init app (to do once)
-`sh init_app.sh`
+`sudo sh init_app.sh`
 
 ### start python Flask server
 `flask run`
