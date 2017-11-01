@@ -1,7 +1,6 @@
 from lameufquijouedans import app
 from flask import Flask
 from lameufquijouedans.celery.flask_celery import make_celery
-import celeryconfig
 
 # app.config.update(
 #     CELERY_BROKER_URL='amqp://guest@localhost//',
@@ -14,6 +13,7 @@ celery = make_celery(app)
 
 @celery.task(name='test_check')
 def check(obj):
+    print('toutouyoutou')
     if obj:
         return True
     else:
