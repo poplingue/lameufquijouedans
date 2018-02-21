@@ -27,13 +27,31 @@ li
   transition: all 1s linear
   opacity: 0
 
-.container
+#wrap-container
+  transition: background-color 0.6s ease
   background: url('/image/bg_popcorn.png') no-repeat
   height: 100vh
   width: 100%
   background-position: 50% 0
 
+#wrap-container.ready
+  background-color: rgba(249,210,29,1)
+  transition: background-color 0.6s ease
+  #wrap-form
+    transition: top 1s ease
+    top: 20%
+
+#wrap-container:before
+  position: absolute
+  top: 0
+  right: 0
+  bottom: 0
+  left: 0
+  background-color: inherit
+  content: ' '
+
 #wrap-form
+  transition: top 1s ease
   position: absolute
   width: calc(100% - 24px)
   text-align: center
