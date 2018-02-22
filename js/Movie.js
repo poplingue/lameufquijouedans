@@ -18,8 +18,8 @@ class Movie extends React.Component {
 
     return (
       <div>
-        <p>{this.props.movie}</p>
         <img src={this.props.poster ? 'https://image.tmdb.org/t/p/w92' + this.props.poster : 'http://lorempixel.com/92/138/animals/'} />
+        <p>{this.props.movie}</p>
         <ul className='actor-list'>
           {this.listActor}
         </ul>

@@ -7,8 +7,21 @@ li
   list-style-type: none
 
 .movie-list
+  width: 385px
+  padding: 0
+  margin: 0 auto
   > li
+    text-align: left
     position: relative
+    font-family: 'Montserrat', sans-serif
+    p,img
+      display: inline-block
+    p
+      vertical-align: top
+      font-size: 22px
+      padding-left: 10px
+    img
+      margin: 15px 0px 10px 0px
 
 .actor-list
   margin-left: 20%
@@ -39,7 +52,7 @@ li
   transition: background-color 0.6s ease
   #wrap-form
     transition: top 1s ease
-    top: 20%
+    top: 0%
 
 #wrap-container:before
   position: absolute
@@ -49,6 +62,7 @@ li
   left: 0
   background-color: inherit
   content: ' '
+  height: 102%
 
 #wrap-form
   transition: top 1s ease
@@ -56,6 +70,7 @@ li
   width: calc(100% - 24px)
   text-align: center
   top: 70%
+  margin: 25px
   form input
     border: none
     padding: 10px
