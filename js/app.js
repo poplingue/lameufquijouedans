@@ -56,6 +56,9 @@ class App extends React.Component {
         }).then((actorList) => {
             this.setState({currentMovie: id, actorList: actorList})
         })
+
+        this.appStep('actor')
+
     }
 
     updateArrayActors(casting) {
@@ -138,16 +141,28 @@ class App extends React.Component {
                 }
                 httpRequest.send()
             } else {
-                reject('write something')
+                this.appStep(null)
+                // reject('write something')
             }
         })
     }
 
-    appReady(e) {
+    appStep(e) {
+
+        if(!e){
+            document.getElementById('wrap-container').className = ''
+            this.setState({movieList: [],actorList: []})
+            return
+        }
+
+        if(e == 'actor'){
+            document.getElementById('wrap-container').className = 'step-actor'
+        }
+
         if (e.type == 'blur' && this.state.value == '') {
             document.getElementById('wrap-container').className = ''
-        } else {
-            document.getElementById('wrap-container').className = 'ready'
+        } else if(e.type == 'focus') {
+            document.getElementById('wrap-container').className = 'step-movie'
         }
     }
 
@@ -159,12 +174,12 @@ class App extends React.Component {
                 <input
                     type="text"
                     autoComplete="off"
-                    placeholder='Billy Elliot, Titanic...'
+                    placeholder='The host, Billy Elliot...'
                     id="value"
                     value={this.state.value}
                     onChange={(e)=>this.searchMovies(e)}
-                    onFocus={(e) => this.appReady(e)}
-                    onBlur={(e) => this.appReady(e)}/>
+                    onFocus={(e) => this.appStep(e)}
+                    onBlur={(e) => this.appStep(e)}/>
                 <input type="submit" value="" id="send"/>
               </form>
               <ul className='movie-list'>
